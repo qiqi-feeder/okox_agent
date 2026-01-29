@@ -26,10 +26,26 @@ GROUP_TOP1_X, GROUP_TOP1_Y = 0, 0
 CHAT_INPUT_X, CHAT_INPUT_Y = 0, 0
 CHAT_SEND_X, CHAT_SEND_Y = 0, 0
 
-# --- Task B: Share Profile Card ---
-PROFILE_SHARE_X, PROFILE_SHARE_Y = 0, 0
-SHARE_RECENT_1_X, SHARE_RECENT_1_Y = 0, 0
-SHARE_CONFIRM_X, SHARE_CONFIRM_Y = 0, 0
+# --- Task B: Share Profile Card (Refined Search Flow) ---
+TARGET_GROUP_NAME = "TargetGroupName"
+
+# 1. More/Three Dots Icon
+PROFILE_MORE_X, PROFILE_MORE_Y = 0, 0
+
+# 2. Share Profile Option (Popup)
+PROFILE_MENU_SHARE_X, PROFILE_MENU_SHARE_Y = 0, 0
+
+# 3. Share to Chat Icon
+SHARE_TO_CHAT_X, SHARE_TO_CHAT_Y = 0, 0
+
+# 4. Search Input Box
+SHARE_SEARCH_X, SHARE_SEARCH_Y = 0, 0
+
+# 5. First Search Result
+SHARE_RESULT_1_X, SHARE_RESULT_1_Y = 0, 0
+
+# 6. Bottom Share Button
+SHARE_BOTTOM_BTN_X, SHARE_BOTTOM_BTN_Y = 0, 0
 
 # --- Task C: Follow Back ---
 PROFILE_FANS_LIST_X, PROFILE_FANS_LIST_Y = 0, 0
