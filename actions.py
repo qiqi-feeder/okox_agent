@@ -179,7 +179,15 @@ def perform_task_c_follow_back():
         # Wait for scroll to settle
         time.sleep(2.0)
         
-    # 5. End of Task C (Return to Planet & Reset State)
+    # 5. End of Task C (Safe Exit & Reset)
+    # User feedback: Might be deep in a profile page due to accidental clicks.
+    # Action: Press Back slowly to exit any profile, then navigate to Planet.
+    logger.info("Finishing Task C: Safe Exit Sequence...")
+    for i in range(2): 
+        utils.press_back()
+        # Sleep > 2.0s to avoid "Press again to exit app" trigger
+        time.sleep(3.0) 
+    
     logger.info("Returning to Planet (Reset State)...")
     utils.navigate_to_planet()
     logger.info("--- Task C Complete ---")
