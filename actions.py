@@ -179,5 +179,7 @@ def perform_task_c_follow_back():
         # Wait for scroll to settle
         time.sleep(2.0)
         
-    # 5. End of Task C
+    # 5. End of Task C (Return to Planet & Reset State)
+    logger.info("Returning to Planet (Reset State)...")
+    utils.navigate_to_planet()
     logger.info("--- Task C Complete ---")
