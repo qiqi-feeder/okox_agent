@@ -103,8 +103,10 @@ def perform_task_b_share_profile():
     utils.safe_click(config.SHARE_BOTTOM_BTN_X, config.SHARE_BOTTOM_BTN_Y, "Bottom Share Button")
     utils.random_sleep(3.0, 5.0)
     
-    # 5. Return to Planet (Assume we are back on Profile or Chat, safer to nav home)
-    utils.navigate_to_planet()
+    # 5. Return to Planet
+    # User feedback: No "Planet" button on Profile page. Use System Back.
+    logger.info("Returning to Planet (System Back)...")
+    utils.press_back()
     logger.info("--- Task B Complete ---")
 
 def perform_task_c_follow_back():
