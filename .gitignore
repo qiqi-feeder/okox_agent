@@ -12,3 +12,6 @@ env/
 # Airtest
 log/
 *.log
+
+# User Config (Sensitive Coordinates)
+config.py

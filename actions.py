@@ -97,55 +97,53 @@ def perform_task_c_follow_back():
     utils.safe_click(config.PROFILE_FANS_LIST_X, config.PROFILE_FANS_LIST_Y, "Fans/Followers List")
     utils.random_sleep(3.0, 5.0) # Wait for list to load
     
-    # Settings for Image Matching
+    # settings
     MAX_SWIPES = 5
     IMAGE_PATH = r"assets/btn_follow.png"
-    MATCH_THRESHOLD = 0.9 # High threshold to distinguish Black vs Gray/White buttons
+    MATCH_THRESHOLD = 0.9 
+    
+    total_followed = 0
     
     # 3. Detection and Action Loop
     for page in range(MAX_SWIPES):
         logger.info(f"Scanning Page {page + 1}/{MAX_SWIPES}...")
         
-        try:
-            # find_all returns a list of coordinates for all matches
-            # using record_pos=None to avoid clogging logs/reports if not needed
-            matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
-            
-            if not matches:
-                logger.info("No 'Follow' buttons found on this page.")
-            else:
-                logger.info(f"Found {len(matches)} potential buttons. Limiting to first 3 for testing.")
+        # Inner loop: Keep finding and clicking buttons ONE BY ONE on the current screen
+        # This prevents stale coordinates if layout shifts or state changes.
+        follow_found_on_page = True
+        while follow_found_on_page:
+            try:
+                # Limit check
+                if total_followed >= 3:
+                    logger.info("Test Limit Reached (Max 3). Stopping Task C.")
+                    break
                 
-                # Limit to first 3 matches only
-                limited_matches = matches[:3]
+                # Look for ONE target
+                pos = exists(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
                 
-                # Perform clicks
-                for match in limited_matches:
-                    try:
-                        # CRITICAL FIX: find_all returns a dict, e.g. {'result': (x,y), ...}
-                        # We must extract the coordinate tuple from 'result' key.
-                        click_pos = match['result']
-                        logger.info(f"Clicking Follow Button at {click_pos}")
-                        touch(click_pos)
-                        # Random sleep after each follow
-                        utils.random_sleep(1.0, 2.0)
-                    except Exception as e:
-                        logger.error(f"Failed to click match: {e}")
-                
-                # For testing purposes, we stop after processing the first valid page/batch
-                logger.info("Test Limit Reached (Max 3). Stopping Task C.")
-                break
-                        
-        except TargetNotFoundError:
-             logger.info("No targets found (TargetNotFoundError).")
-        except Exception as e:
-            logger.error(f"Error during detection loop: {e}")
+                if pos:
+                    logger.info(f"Found Follow Button at {pos}")
+                    touch(pos)
+                    total_followed += 1
+                    
+                    # Wait for UI to update (Button turns gray/white)
+                    # This is CRITICAL: Ensure the clicked button no longer matches 'Black' before scanning again
+                    utils.random_sleep(2.0, 3.0) 
+                else:
+                    logger.info("No more 'Follow' buttons found on this page.")
+                    follow_found_on_page = False
+                    
+            except Exception as e:
+                logger.error(f"Error during click loop: {e}")
+                follow_found_on_page = False
+
+        if total_followed >= 3:
+            break
         
-        # 4. Scroll for next page (Only if we didn't break above)
+        # 4. Scroll for next page
         logger.info("Scrolling down...")
         swipe((500, 1800), (500, 600))
         time.sleep(2.0)
         
-    # 5. Return to Planet
-    utils.navigate_to_planet()
+    # 5. End of Task C
     logger.info("--- Task C Complete ---")
