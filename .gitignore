@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+.vscode/
+.idea/
+venv/
+env/
+.env
+
+# Airtest
+log/
+*.log
