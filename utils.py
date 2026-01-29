@@ -102,9 +102,7 @@ def navigate_to_planet():
     safe_click(config.NAV_PLANET_X, config.NAV_PLANET_Y, "Bottom Nav - Planet")
     random_sleep(1.0, 2.0)
     
-    # 2. Click again to ensure we are focused / trigger scroll-to-top
-    safe_click(config.NAV_PLANET_X, config.NAV_PLANET_Y, "Bottom Nav - Planet (Retry)")
-    random_sleep(1.0, 1.5)
+    # 2. (Removed Double Click) - User feedback says app doesn't support it.
     
     # 3. Swipe Down to Ensure List is at Top
     # To scroll UP (show top content), we drag DOWN (e.g., 500 -> 1500).
