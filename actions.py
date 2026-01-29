@@ -126,52 +126,57 @@ def perform_task_c_follow_back():
     utils.safe_click(config.PROFILE_FANS_LIST_X, config.PROFILE_FANS_LIST_Y, "Fans/Followers List")
     utils.random_sleep(3.0, 5.0) # Wait for list to load
     
-    # settings
+    # Settings
     MAX_SWIPES = 5
     IMAGE_PATH = r"assets/btn_follow.png"
     MATCH_THRESHOLD = 0.9 
     
-    total_followed = 0
-    
-    # 3. Detection and Action Loop
+    # 3. Detection and Action Loop (Batch Processing)
     for page in range(MAX_SWIPES):
         logger.info(f"Scanning Page {page + 1}/{MAX_SWIPES}...")
         
-        # Inner loop: Keep finding and clicking buttons ONE BY ONE on the current screen
-        # This prevents stale coordinates if layout shifts or state changes.
-        follow_found_on_page = True
-        while follow_found_on_page:
-            try:
-                # Limit check
-                if total_followed >= 3:
-                    logger.info("Test Limit Reached (Max 3). Stopping Task C.")
-                    break
+        try:
+            # Step 1: Scan ONCE (find_all returns list of dicts)
+            matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
+            
+            if not matches:
+                logger.info("No 'Follow' buttons found on this page.")
+            else:
+                # Step 2: Deduplicate (Sort by Y, filter overlaps < 20px)
+                matches.sort(key=lambda m: m['result'][1])
+                unique_matches = []
+                last_y = -999
+                for match in matches:
+                    curr_y = match['result'][1]
+                    if abs(curr_y - last_y) > 20:
+                        unique_matches.append(match)
+                        last_y = curr_y
                 
-                # Look for ONE target
-                pos = exists(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
+                logger.info(f"Found {len(matches)} raw -> {len(unique_matches)} unique buttons. Batch clicking...")
                 
-                if pos:
-                    logger.info(f"Found Follow Button at {pos}")
-                    touch(pos)
-                    total_followed += 1
-                    
-                    # Wait for UI to update (Button turns gray/white)
-                    # This is CRITICAL: Ensure the clicked button no longer matches 'Black' before scanning again
-                    utils.random_sleep(2.0, 3.0) 
-                else:
-                    logger.info("No more 'Follow' buttons found on this page.")
-                    follow_found_on_page = False
-                    
-            except Exception as e:
-                logger.error(f"Error during click loop: {e}")
-                follow_found_on_page = False
-
-        if total_followed >= 3:
-            break
+                # Step 3: Click ALL unique matches found on this screen
+                for i, match in enumerate(unique_matches):
+                    try:
+                        pos = match['result']
+                        logger.info(f"[{i+1}/{len(unique_matches)}] Clicking Follow at {pos}")
+                        touch(pos)
+                        
+                        # Step 4: Short random sleep between clicks
+                        # User Request: random.uniform(0.8, 1.5)
+                        time.sleep(random.uniform(0.8, 1.5))
+                        
+                    except Exception as e:
+                        logger.error(f"Failed to click match: {e}")
+                        
+        except TargetNotFoundError:
+             logger.info("No targets found (TargetNotFoundError).")
+        except Exception as e:
+            logger.error(f"Error during detection loop: {e}")
         
-        # 4. Scroll for next page
+        # Step 5: Scroll for next page
         logger.info("Scrolling down...")
         swipe((500, 1800), (500, 600))
+        # Wait for scroll to settle
         time.sleep(2.0)
         
     # 5. End of Task C

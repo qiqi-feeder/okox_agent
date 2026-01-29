@@ -5,20 +5,20 @@ import actions
 import traceback
 
 # Configure logging
+# Note: Airtest noise is suppressed in utils.py
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger("TestTaskC")
 
 def test_task_c():
-    logger.info("=== Testing Task C: Follow Back (Image Based) ===")
-    logger.info("Prerequisite: Ensure 'assets/btn_follow.png' exists and screen is unlocked.")
+    logger.info("=== Testing Task C: Follow Back (Optimized Batch Processing) ===")
+    logger.info("Prerequisite: Ensure 'assets/btn_follow.png' exists.")
     
     try:
         # 1. Connect
         utils.init_device_connection()
         utils.ensure_app_active()
         
-        # 2. Run Task C
-        # Logic: Planet -> Profile Icon -> Fans List -> Image Scan & Click
+        # 2. Run Task C (Scan Once, Click All, No Limits)
         actions.perform_task_c_follow_back()
         
         logger.info("=== Test Passed: Task C Completed Successfully ===")
