@@ -22,14 +22,21 @@
 -   [x] **GROUP_TOP1_X, GROUP_TOP1_Y**: 点击消息列表中 **置顶的第1个群组**。
 -   *进入群聊界面后:*
 -   [x] **CHAT_INPUT_X, CHAT_INPUT_Y**: 点击底部的 **文本输入框**。
--   [ ] **CHAT_SEND_X, CHAT_SEND_Y**: **关键点**: 不是键盘上的回车(键盘会被隐藏)。请点击输入框右侧（或上方）的 **APP自带发送图标** (通常是纸飞机或箭头)。
+-   [x] **CHAT_SEND_X, CHAT_SEND_Y**: 请点击输入框右侧（或上方）的 **APP自带发送图标**。
 
-### 3. 任务 B: 分享名片 (Task B: Share Profile)
--   *首先点击 "星球" (Planet) Tab -> 再点击头像。*
--   [ ] **PROFILE_SHARE_X, PROFILE_SHARE_Y**: 点击右上角的 **分享图标**。
--   *等待分享面板弹出:*
--   [ ] **SHARE_RECENT_1_X, SHARE_RECENT_1_Y**: 点击 "最近 (Recent)" 分享列表中的 **第1个头像/群组**。
--   [ ] **SHARE_CONFIRM_X, SHARE_CONFIRM_Y**: 如果出现 "确认发送" 弹窗，点击确认按钮。
+### 3. 任务 B: 分享名片 (Task B: Share Profile - New Search Flow)
+-   **目标群名**: 在 `config.py` 中设置 `TARGET_GROUP_NAME` 为您想分享的群全名。
+-   *步骤 1：主页更多选项*
+    -   [ ] **PROFILE_MORE_X, PROFILE_MORE_Y**: 个人主页右上角的 **"..." (三个点)** 图标。
+-   *步骤 2：弹出菜单*
+    -   [ ] **PROFILE_MENU_SHARE_X, PROFILE_MENU_SHARE_Y**: 菜单中的 **"分享主页"** 选项。
+-   *步骤 3：分享渠道*
+    -   [ ] **SHARE_TO_CHAT_X, SHARE_TO_CHAT_Y**: 分享面板中的 **"聊天 (Chat)"** 图标。 (不是复制链接，是分享到OKX内部聊天)
+-   *步骤 4：搜索与选择*
+    -   [ ] **SHARE_SEARCH_X, SHARE_SEARCH_Y**: 联系人选择页顶部的 **搜索输入框**。
+    -   *（机器人会输入群名）*
+    -   [ ] **SHARE_RESULT_1_X, SHARE_RESULT_1_Y**: 搜索结果列表出来的 **第1个结果**。
+    -   [ ] **SHARE_BOTTOM_BTN_X, SHARE_BOTTOM_BTN_Y**: 屏幕最底部的 **"发送/确定"** 蓝色大按钮。
 
 ### 4. 任务 C: 粉丝回关 (Task C: Follow Back)
 -   *首先点击 "星球" (Planet) Tab -> 再点击头像。*
@@ -42,8 +49,3 @@
 ### 5. 其他设置 (Other Settings)
 -   [ ] **MSG_POOL**: 在 `config.py` 中编辑您的喊话内容列表。
 -   [ ] **DEVICE_SERIAL**: 如果您连接了多台设备，请运行 `adb devices` 获取序列号并填入。
-
-## 如何运行 (How to Run)
-1.  打开命令提示符 (cmd)。
-2.  进入项目目录: `cd d:/workspace/okox_agent`
-3.  运行脚本: `python main.py`

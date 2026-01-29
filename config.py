@@ -46,21 +46,33 @@ CHAT_INPUT_X, CHAT_INPUT_Y = 575, 2550
 # 【重要说明】: 由于 Yosemite 输入法会隐藏键盘，无法使用键盘上的回车发送。
 # 必须使用 OKX 界面上输入框右侧的 "发送" 图标/箭头/纸飞机。
 # (MUST be the App's UI Send Icon, NOT keyboard button, as keyboard is hidden.)
-CHAT_SEND_X, CHAT_SEND_Y = 1110, 2485
+CHAT_SEND_X, CHAT_SEND_Y = 1110, 2555
 
 # --- Task B: Share Profile Card (任务 B: 分享名片) ---
-# 1. 个人主页右上角的分享图标 (Share Icon on Profile Page)
-PROFILE_SHARE_X, PROFILE_SHARE_Y = 980, 150
+# 目标群组名称 (精确匹配) - 用于搜索
+TARGET_GROUP_NAME = "MyTargetGroup" 
 
-# 2. 分享面板中的目标群组 ("最近"列表中的第1个) (Target Group in Share Sheet)
-SHARE_RECENT_1_X, SHARE_RECENT_1_Y = 200, 1400
+# 1. 个人主页右上角的 "..." (更多) 图标 (Three Dots / More)
+PROFILE_MORE_X, PROFILE_MORE_Y = 980, 150
 
-# 3. 确认发送/分享按钮 (如果出现弹窗) (Confirm Send/Share Button)
-SHARE_CONFIRM_X, SHARE_CONFIRM_Y = 1111, 2485
+# 2. 弹出菜单中的 "分享主页" 选项 (Share Profile Option)
+PROFILE_MENU_SHARE_X, PROFILE_MENU_SHARE_Y = 500, 1800 
+
+# 3. 分享列表中的 "聊天" 图标 (Share to Chat)
+SHARE_TO_CHAT_X, SHARE_TO_CHAT_Y = 500, 1500
+
+# 4. 联系人选择页面的 "搜索" 输入框 (Search Input)
+SHARE_SEARCH_X, SHARE_SEARCH_Y = 500, 300
+
+# 5. 搜索结果列表中的 "第1项" (First Result)
+SHARE_RESULT_1_X, SHARE_RESULT_1_Y = 500, 600
+
+# 6. 底部的 "发送/分享" 确认按钮 (Bottom Send/Share Button)
+SHARE_BOTTOM_BTN_X, SHARE_BOTTOM_BTN_Y = 800, 2500
 
 # --- Task C: Follow Back (任务 C: 粉丝回关) ---
 # 1. 个人主页的 "粉丝/关注者" 列表入口 (Fans/Followers list)
-PROFILE_FANS_LIST_X, PROFILE_FANS_LIST_Y = 423, 773
+PROFILE_FANS_LIST_X, PROFILE_FANS_LIST_Y = 350, 650
 
 # 2. 关注按钮扫描区域 (Follow Button Scan Area)
 # 关注按钮的水平 X 坐标 (X-coordinate for Follow button)

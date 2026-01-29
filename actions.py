@@ -54,9 +54,14 @@ def perform_task_a_shoutout():
 
 def perform_task_b_share_profile():
     """
-    Task B: Share Profile Card
+    Task B: Share Profile Card (Refined Search Flow)
+    1. Go to Planet Tab -> Profile
+    2. Click More (...) -> Share Profile -> Chat
+    3. Click Search -> Input Group Name -> Click Result
+    4. Click Share/Send Button
+    5. Return to Planet
     """
-    logger.info("--- Starting Task B: Share Profile ---")
+    logger.info("--- Starting Task B: Share Profile (Search Flow) ---")
     
     # 1. Go to Profile Page (via Planet Tab)
     utils.navigate_to_planet() 
@@ -64,19 +69,41 @@ def perform_task_b_share_profile():
     utils.safe_click(config.NAV_PROFILE_ICON_X, config.NAV_PROFILE_ICON_Y, "Profile Icon")
     utils.random_sleep(2.0, 3.0)
     
-    # 2. Click Share Icon
-    utils.safe_click(config.PROFILE_SHARE_X, config.PROFILE_SHARE_Y, "Share Icon")
-    utils.random_sleep(2.0, 4.0)
+    # 2. Open Menu and Share
+    logger.info("Opening More Menu...")
+    utils.safe_click(config.PROFILE_MORE_X, config.PROFILE_MORE_Y, "More (...) Icon")
+    utils.random_sleep(1.0, 2.0)
     
-    # 3. Select Target Group (First in Recent)
-    utils.safe_click(config.SHARE_RECENT_1_X, config.SHARE_RECENT_1_Y, "Recent Contact 1")
-    utils.random_sleep(1.5, 2.5)
-    
-    # 4. Confirm Send (if needed)
-    utils.safe_click(config.SHARE_CONFIRM_X, config.SHARE_CONFIRM_Y, "Confirm Share")
+    logger.info("Clicking Share Profile...")
+    utils.safe_click(config.PROFILE_MENU_SHARE_X, config.PROFILE_MENU_SHARE_Y, "Share Profile Option")
     utils.random_sleep(2.0, 3.0)
     
-    # 5. Return to Planet
+    logger.info("Selecting 'Chat' channel...")
+    utils.safe_click(config.SHARE_TO_CHAT_X, config.SHARE_TO_CHAT_Y, "Share to Chat Icon")
+    utils.random_sleep(2.0, 4.0)
+    
+    # 3. Search for Target Group
+    logger.info(f"Searching for group: {config.TARGET_GROUP_NAME}")
+    # Click Search Box
+    utils.safe_click(config.SHARE_SEARCH_X, config.SHARE_SEARCH_Y, "Search Input Box")
+    utils.random_sleep(1.0, 1.5)
+    
+    # Input Name
+    utils.enter_text_safe(config.TARGET_GROUP_NAME)
+    # Give search results time to load
+    utils.random_sleep(2.0, 3.0)
+    
+    # Click First Result
+    logger.info("Selecting first search result...")
+    utils.safe_click(config.SHARE_RESULT_1_X, config.SHARE_RESULT_1_Y, "First Search Result")
+    utils.random_sleep(1.5, 2.5)
+    
+    # 4. Click Final Share/Send Button
+    logger.info("Clicking Final Share Button...")
+    utils.safe_click(config.SHARE_BOTTOM_BTN_X, config.SHARE_BOTTOM_BTN_Y, "Bottom Share Button")
+    utils.random_sleep(3.0, 5.0)
+    
+    # 5. Return to Planet (Assume we are back on Profile or Chat, safer to nav home)
     utils.navigate_to_planet()
     logger.info("--- Task B Complete ---")
 
