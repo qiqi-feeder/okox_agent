@@ -85,10 +85,31 @@ def ensure_app_active():
 
 def navigate_to_planet():
     """
-    Navigates to the 'Planet' (星球) Tab.
+    Navigates to the 'Planet' (星球) Tab AND ensures list is at the top.
+    Strategies:
+    1. Click Planet Tab.
+    2. Click it again (force refresh/scroll top).
+    3. Swipe Down (drag from top down) to ensure list is at top.
     """
+    logger.info("Navigating to Planet Tab (Resetting State)...")
+    
+    # 1. Click Tab
     safe_click(config.NAV_PLANET_X, config.NAV_PLANET_Y, "Bottom Nav - Planet")
-    random_sleep(2.0, 3.0)
+    random_sleep(1.0, 2.0)
+    
+    # 2. Click again to ensure we are focused / trigger scroll-to-top
+    safe_click(config.NAV_PLANET_X, config.NAV_PLANET_Y, "Bottom Nav - Planet (Retry)")
+    random_sleep(1.0, 1.5)
+    
+    # 3. Swipe Down to Ensure List is at Top
+    # To scroll UP (show top content), we drag DOWN (e.g., 500 -> 1500).
+    logger.info("Resetting list position (Swipe Down)...")
+    try:
+        # Check if swipe is available (it is imported from airtest.core.api)
+        swipe((500, 500), (500, 1500)) 
+        random_sleep(1.5, 2.5)
+    except Exception as e:
+        logger.error(f"Swipe failed: {e}")
 
 def press_back():
     """

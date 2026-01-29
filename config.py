@@ -110,6 +110,6 @@ CLICK_DELAY_MAX = 3.5
 TYPING_DELAY_MIN = 1.0
 TYPING_DELAY_MAX = 2.0
 
-# 主循环等待时间 (10 到 15 分钟) (Main Loop Wait Time)
-LOOP_WAIT_MIN = 600  # 10 mins
-LOOP_WAIT_MAX = 900  # 15 mins
+# 主循环等待时间 (15 到 30 分钟) (Main Loop Wait Time) - Updated as per user request
+LOOP_WAIT_MIN = 900  # 15 mins
+LOOP_WAIT_MAX = 1800 # 30 mins

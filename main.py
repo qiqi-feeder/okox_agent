@@ -17,13 +17,16 @@ def run_cycle():
     """
     logger.info(">>> Starting New Cycle <<<")
     
-    # Randomize order of tasks for better anti-ban
+    # Fixed Sequence as per User Request:
+    # 1. Share Profile (Task B)
+    # 2. Shout-out (Task A)
+    # 3. Follow Back (Task C)
     task_list = [
-        actions.perform_task_a_shoutout,
         actions.perform_task_b_share_profile,
+        actions.perform_task_a_shoutout,
         actions.perform_task_c_follow_back
     ]
-    random.shuffle(task_list)
+    # random.shuffle(task_list) # Disabled shuffle for fixed sequence
     
     for task_func in task_list:
         try:
