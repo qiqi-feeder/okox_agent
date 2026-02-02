@@ -74,3 +74,18 @@ TYPING_DELAY_MIN = 1.0
 TYPING_DELAY_MAX = 2.0
 LOOP_WAIT_MIN = 600
 LOOP_WAIT_MAX = 900
+
+# ==============================================================================
+# 5. ANTI-SPAM (防刷屏设置)
+# ==============================================================================
+# 如果开启，机器人会在喊话前检查最后一条消息是否是自己发的。
+# If enabled, checks if the last message is sent by you before shouting out.
+ENABLE_ANTI_SPAM = False
+
+# 你的头像截图路径 (截取一个小方块即可，不要包含背景)
+# Path to your avatar screenshot (crop tightly, no background)
+MY_AVATAR_FILE = "assets/my_avatar.png"
+
+# 检测区域阈值 (0.0 - 1.0)
+# 只有当你的头像出现在屏幕下方 (例如 > 50% 高度) 时才判定为最新消息。
+LAST_MSG_CHECK_HEIGHT = 0.5

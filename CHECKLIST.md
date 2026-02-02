@@ -49,3 +49,9 @@
 ### 5. 其他设置 (Other Settings)
 -   [ ] **MSG_POOL**: 在 `config.py` 中编辑您的喊话内容列表。
 -   [ ] **DEVICE_SERIAL**: 如果您连接了多台设备，请运行 `adb devices` 获取序列号并填入。
+
+### 6. (可选) 防刷屏设置 (Anti-Spam Settings)
+如果您希望在上一条消息是自己发的时候跳过喊话：
+1.  **截图**: 截取一张您自己在聊天中的头像（越清晰越好，不带背景）。
+2.  **保存**: 将图片命名为 `my_avatar.png` 并保存在 `assets/` 文件夹下。
+3.  **配置**: 在 `config.py` 中设置 `ENABLE_ANTI_SPAM = True`。

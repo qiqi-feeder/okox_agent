@@ -26,6 +26,15 @@ def perform_task_a_shoutout():
     utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
     utils.random_sleep(2.0, 4.0)
     
+    # [NEW] Anti-Spam Check
+    # Checks if the last message is sent by me. If so, skips sending.
+    if getattr(config, 'ENABLE_ANTI_SPAM', False):
+        logger.info("Performing Anti-Spam Check...")
+        if utils.check_last_message_is_mine(config.MY_AVATAR_FILE, getattr(config, 'LAST_MSG_CHECK_HEIGHT', 0.5)):
+            logger.info(">>> SKIP: Last message is mine. Returning to Planet. <<<")
+            utils.press_back() # Exit Chat
+            return
+    
     # 3. Click Input Box
     utils.safe_click(config.CHAT_INPUT_X, config.CHAT_INPUT_Y, "Chat Input Box")
     utils.random_sleep(1.0, 2.0)

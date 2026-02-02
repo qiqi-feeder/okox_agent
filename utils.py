@@ -2,6 +2,7 @@
 import time
 import random
 import logging
+import os
 from airtest.core.api import *
 from airtest.core.error import *
 import config
@@ -124,3 +125,56 @@ def press_back():
         random_sleep(1.0, 1.5)
     except Exception as e:
         logger.error(f"Failed to press back: {e}")
+
+def check_last_message_is_mine(avatar_path, height_threshold=0.5):
+    """
+    Checks if the last message in the chat is sent by the current user.
+    It looks for the user's avatar in the lower portion of the screen.
+    
+    Args:
+        avatar_path (str): Path to the avatar image file.
+        height_threshold (float): 0.0 to 1.0. Only considers matches below this relative height.
+                                  e.g., 0.5 means lower half of the screen.
+    Returns:
+        bool: True if last message is likely mine, False otherwise.
+    """
+    if not os.path.exists(avatar_path):
+        logger.warning(f"Anti-spam check skipped: Avatar file not found at '{avatar_path}'")
+        return False
+
+    logger.info("Checking if last message is mine...")
+    
+    try:
+        # Find all occurrences of the avatar on screen
+        # Use a high threshold to avoid false positives
+        matches = find_all(Template(avatar_path, threshold=0.85))
+        
+        if not matches:
+            logger.info("No avatar matches found on screen.")
+            return False
+            
+        # Get screen height
+        screen_height = G.DEVICE.display_info['height']
+        threshold_y = screen_height * height_threshold
+        
+        # Sort matches by Y coordinate (descending) -> lowest on screen first
+        # match['result'] is (x, y) center point
+        sorted_matches = sorted(matches, key=lambda m: m['result'][1], reverse=True)
+        
+        most_recent_match = sorted_matches[0]
+        match_y = most_recent_match['result'][1]
+        
+        logger.info(f"Found avatar at Y={match_y} (Threshold > {threshold_y})")
+        
+        if match_y > threshold_y:
+            return True
+        else:
+            logger.info("Avatar found, but not at the bottom (old message).")
+            return False
+            
+    except TargetNotFoundError:
+        logger.info("Avatar not found on screen.")
+        return False
+    except Exception as e:
+        logger.error(f"Error during anti-spam check: {e}")
+        return False
