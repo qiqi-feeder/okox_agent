@@ -126,6 +126,30 @@ def press_back():
     except Exception as e:
         logger.error(f"Failed to press back: {e}")
 
+def get_random_group_from_file(file_path="groups.txt"):
+    """
+    Reads the group list from a file and returns a random group name.
+    Returns None if file doesn't exist or is empty.
+    """
+    if not os.path.exists(file_path):
+        logger.warning(f"Group file not found: {file_path}")
+        return None
+        
+    try:
+        with open(file_path, 'r', encoding='utf-8') as f:
+            lines = [line.strip() for line in f if line.strip() and not line.startswith('#')]
+            
+        if not lines:
+            logger.warning(f"Group file is empty: {file_path}")
+            return None
+            
+        selected_group = random.choice(lines)
+        logger.info(f"Selected target group: {selected_group}")
+        return selected_group
+    except Exception as e:
+        logger.error(f"Failed to read group file: {e}")
+        return None
+
 def check_last_message_is_mine(avatar_path, height_threshold=0.5):
     """
     Checks if the last message in the chat is sent by the current user.

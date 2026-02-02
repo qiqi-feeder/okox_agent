@@ -15,6 +15,15 @@ PACKAGE_NAME = "com.okinc.okex.gp"
 # 底部导航栏 - "星球" (Planet Tab)
 NAV_PLANET_X, NAV_PLANET_Y = 0, 0 
 
+# 星球页面顶部搜索入口 (Search Icon on Planet Page)
+PLANET_SEARCH_ICON_X, PLANET_SEARCH_ICON_Y = 0, 0
+
+# 搜索页面的输入框 (Search Input Box)
+PLANET_SEARCH_INPUT_X, PLANET_SEARCH_INPUT_Y = 0, 0
+
+# 搜索结果的第一个条目 (First Result Item)
+PLANET_SEARCH_RESULT_X, PLANET_SEARCH_RESULT_Y = 0, 0
+
 # 用户个人主页图标 (User Profile Icon)
 NAV_PROFILE_ICON_X, NAV_PROFILE_ICON_Y = 0, 0
 

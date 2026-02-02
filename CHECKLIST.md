@@ -15,10 +15,19 @@
 
 ### 1. 全局导航 - "星球" (Global Navigation - Planet Tab)
 -   [x] **NAV_PLANET_X, NAV_PLANET_Y**: 点击底部的 **"星球"** 图标 (这是核心入口)。
+-   [ ] **PLANET_SEARCH_ICON_X, PLANET_SEARCH_ICON_Y**: 星球页面顶部的 **"搜索" (放大镜)** 图标。
+-   [ ] **PLANET_SEARCH_INPUT_X, PLANET_SEARCH_INPUT_Y**: 点击搜索图标后，进入的搜索页面顶部的 **输入框**。
+-   [ ] **PLANET_SEARCH_RESULT_X, PLANET_SEARCH_RESULT_Y**: 搜索结果列表出来的 **第1个结果**。
 -   [x] **NAV_PROFILE_ICON_X, NAV_PROFILE_ICON_Y**: **先点击"星球"进入该页面后**，再点击您的 **头像图标**。
 
 ### 2. 任务 A: 群聊喊话 (Task A: Group Chat Shout-out)
--   *首先点击 "星球" (Planet) Tab。*
+**新增功能：多群组轮询**
+-   编辑项目根目录下的 `groups.txt` 文件。
+-   每行输入一个群组的全名。
+-   机器人每次运行时会随机从里面选一个群去搜索并喊话。
+-   如果 `groups.txt` 为空，则默认执行旧逻辑（点击置顶第1个群）。
+
+-   *旧逻辑保留配置:*
 -   [x] **GROUP_TOP1_X, GROUP_TOP1_Y**: 点击消息列表中 **置顶的第1个群组**。
 -   *进入群聊界面后:*
 -   [x] **CHAT_INPUT_X, CHAT_INPUT_Y**: 点击底部的 **文本输入框**。

@@ -10,21 +10,47 @@ logger = logging.getLogger("OKXBot")
 
 def perform_task_a_shoutout():
     """
-    Task A: Group Chat Shout-out
+    Task A: Group Chat Shout-out (Dynamic Group Support)
     1. Go to Planet Tab
-    2. Click Top 1 Group
-    3. Type random message
-    4. Send (Double Safety)
-    5. Return to Planet (Double Back)
+    2. Read 'groups.txt' to get a target group
+    3. If group found: Search -> Enter
+       If no group/file: Click Top 1 (Fallback)
+    4. Anti-Spam Check
+    5. Type & Send
+    6. Return to Planet
     """
     logger.info("--- Starting Task A: Shout-out ---")
     
     # 1. Go to Planet Tab
     utils.navigate_to_planet()
     
-    # 2. Click Top 1 Group (Pinned)
-    utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
-    utils.random_sleep(2.0, 4.0)
+    # 2. Determine Target Group
+    target_group = utils.get_random_group_from_file("groups.txt")
+    
+    entered_via_search = False
+    
+    if target_group:
+        logger.info(f"Mode: Multi-Group Search | Target: {target_group}")
+        # Search Flow
+        # Click Search Icon
+        utils.safe_click(config.PLANET_SEARCH_ICON_X, config.PLANET_SEARCH_ICON_Y, "Planet Search Icon")
+        utils.random_sleep(1.0, 2.0)
+        
+        # Click Input (if needed) and Type
+        utils.safe_click(config.PLANET_SEARCH_INPUT_X, config.PLANET_SEARCH_INPUT_Y, "Search Input")
+        utils.enter_text_safe(target_group)
+        utils.random_sleep(2.0, 3.0)
+        
+        # Click Result
+        utils.safe_click(config.PLANET_SEARCH_RESULT_X, config.PLANET_SEARCH_RESULT_Y, "Search Result")
+        utils.random_sleep(2.0, 4.0) # Wait for chat to load
+        entered_via_search = True
+        
+    else:
+        logger.info("Mode: Single Fixed Group (Top 1)")
+        # Fallback: Click Top 1 Group (Pinned)
+        utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
+        utils.random_sleep(2.0, 4.0)
     
     # [NEW] Anti-Spam Check
     # Checks if the last message is sent by me. If so, skips sending.
@@ -33,6 +59,8 @@ def perform_task_a_shoutout():
         if utils.check_last_message_is_mine(config.MY_AVATAR_FILE, getattr(config, 'LAST_MSG_CHECK_HEIGHT', 0.5)):
             logger.info(">>> SKIP: Last message is mine. Returning to Planet. <<<")
             utils.press_back() # Exit Chat
+            if entered_via_search:
+                utils.press_back() # Exit Search Page to Planet
             return
     
     # 3. Click Input Box
@@ -55,9 +83,15 @@ def perform_task_a_shoutout():
     
     # 6. Return to Planet (Exit Chat Logic)
     # User Request: Back twice (1st: Hide Input, 2nd: Exit Chat)
-    logger.info("Exiting chat (Double Back Strategy)...")
+    logger.info("Exiting chat...")
     utils.press_back() # 1. Hide Keyboard
-    utils.press_back() # 2. Exit Chat to Planet List
+    utils.press_back() # 2. Exit Chat
+    
+    if entered_via_search:
+         # If we entered via search, we are now back at the Search Results page
+         # Need one more back to return to Planet Tab
+         logger.info("Exiting Search Page...")
+         utils.press_back() 
     
     logger.info("--- Task A Complete ---")
 
