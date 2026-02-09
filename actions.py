@@ -8,78 +8,134 @@ import utils
 
 logger = logging.getLogger("OKXBot")
 
-def perform_task_a_shoutout():
+def _shoutout_to_single_group(group_name):
     """
-    Task A: Group Chat Shout-out (OCR-Based Group Detection)
+    Helper function: Send shout-out message to a single group.
+    Assumes we are on the Planet Tab.
     
-    New Flow:
-    1. Go to Planet Tab
-    2. Read 'groups.txt' to get a random target group
-    3. Use OCR to find the group name in the message list and click it
-    4. Anti-Spam Check (if enabled)
-    5. Type & Send message
-    6. Return to Planet
-    """
-    logger.info("--- Starting Task A: Shout-out (OCR Mode) ---")
-    
-    # 1. Go to Planet Tab
-    utils.navigate_to_planet()
-    
-    # 2. Determine Target Group
-    target_group = utils.get_random_group_from_file("groups.txt")
-    
-    if not target_group:
-        logger.warning("No target group found in groups.txt. Using fallback (Top 1).")
-        # Fallback: Click Top 1 Group (Pinned)
-        utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
-        utils.random_sleep(2.0, 4.0)
-    else:
-        # 3. Use OCR to find and click the group
-        logger.info(f"Mode: OCR Detection | Target: '{target_group}'")
+    Args:
+        group_name: Name of the group to shout-out in
         
-        # Try to find and click the group using OCR
+    Returns:
+        True if shout-out was successful, False otherwise
+    """
+    logger.info(f"Shouting out in group: '{group_name}'")
+    
+    try:
+        # 1. Use OCR to find and click the group
+        logger.info(f"Using OCR to find group: '{group_name}'")
         max_scroll = getattr(config, 'OCR_MAX_SCROLL', 3)
-        found = utils.ocr_click_text(target_group, max_scroll=max_scroll, scroll_direction="down")
+        found = utils.ocr_click_text(group_name, max_scroll=max_scroll, scroll_direction="down")
         
         if not found:
-            logger.warning(f"OCR could not find group '{target_group}'. Using fallback (Top 1).")
-            # Reset to top and click first group
-            utils.navigate_to_planet()
-            utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
-            utils.random_sleep(2.0, 4.0)
-        else:
-            # Wait for chat to load
-            utils.random_sleep(2.0, 4.0)
+            logger.warning(f"OCR could not find group '{group_name}'. Skipping.")
+            return False
+        
+        # Wait for chat to load
+        utils.random_sleep(2.0, 4.0)
+        
+        # 2. Anti-Spam Check
+        if getattr(config, 'ENABLE_ANTI_SPAM', False):
+            logger.info("Performing Anti-Spam Check...")
+            if utils.check_last_message_is_mine(config.MY_AVATAR_FILE, getattr(config, 'LAST_MSG_CHECK_HEIGHT', 0.5)):
+                logger.info(">>> SKIP: Last message is mine. <<<")
+                utils.press_back()  # Exit Chat
+                return True  # Not an error, just skipped
+        
+        # 3. Click Input Box
+        utils.safe_click(config.CHAT_INPUT_X, config.CHAT_INPUT_Y, "Chat Input Box")
+        utils.random_sleep(1.0, 2.0)
+        
+        # 4. Type Message
+        msg = random.choice(config.MSG_POOL)
+        utils.enter_text_safe(msg)
+        
+        # 5. Execute Send Logic
+        logger.info("Tentative: Sending EDITOR_ACTION (Enter)...")
+        keyevent("EDITOR_ACTION")
+        utils.random_sleep(0.5, 1.0)
+        
+        # Click Send Button
+        utils.safe_click(config.CHAT_SEND_X, config.CHAT_SEND_Y, "Send Button")
+        utils.random_sleep(2.0, 3.0)
+        
+        # 6. Return to Planet
+        logger.info("Exiting chat...")
+        utils.press_back()  # Hide Keyboard
+        utils.press_back()  # Exit Chat
+        
+        logger.info(f"Successfully sent message to '{group_name}'")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to shout-out in '{group_name}': {e}")
+        # Try to recover
+        utils.press_back()
+        utils.press_back()
+        return False
+
+
+def perform_task_a_shoutout():
+    """
+    Task A: Group Chat Shout-out (Multi-Group Support)
     
-    # 4. Anti-Spam Check
-    if getattr(config, 'ENABLE_ANTI_SPAM', False):
-        logger.info("Performing Anti-Spam Check...")
-        if utils.check_last_message_is_mine(config.MY_AVATAR_FILE, getattr(config, 'LAST_MSG_CHECK_HEIGHT', 0.5)):
-            logger.info(">>> SKIP: Last message is mine. Returning to Planet. <<<")
-            utils.press_back()  # Exit Chat
-            return
+    New Flow:
+    1. Read all groups from 'groups.txt'
+    2. For each group:
+       a. Go to Planet Tab
+       b. Use OCR to find the group name in message list and click it
+       c. Check anti-spam (if enabled)
+       d. Type & Send message
+       e. Return to Planet
+    3. Complete
+    """
+    logger.info("--- Starting Task A: Shout-out (Multi-Group Mode) ---")
     
-    # 5. Click Input Box
-    utils.safe_click(config.CHAT_INPUT_X, config.CHAT_INPUT_Y, "Chat Input Box")
-    utils.random_sleep(1.0, 2.0)
+    # 1. Get all groups from file
+    groups = utils.get_all_groups_from_file("groups.txt")
     
-    # 6. Type Message
-    msg = random.choice(config.MSG_POOL)
-    utils.enter_text_safe(msg)
+    if not groups:
+        # Fallback to single group fixed position
+        logger.warning("No groups in groups.txt. Using fallback (Top 1).")
+        utils.navigate_to_planet()
+        utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
+        utils.random_sleep(2.0, 4.0)
+        
+        # Perform single shout-out
+        utils.safe_click(config.CHAT_INPUT_X, config.CHAT_INPUT_Y, "Chat Input Box")
+        utils.random_sleep(1.0, 2.0)
+        
+        msg = random.choice(config.MSG_POOL)
+        utils.enter_text_safe(msg)
+        
+        keyevent("EDITOR_ACTION")
+        utils.random_sleep(0.5, 1.0)
+        
+        utils.safe_click(config.CHAT_SEND_X, config.CHAT_SEND_Y, "Send Button")
+        utils.random_sleep(2.0, 3.0)
+        
+        utils.press_back()
+        utils.press_back()
+        
+        logger.info("--- Task A Complete (Fallback Mode) ---")
+        return
     
-    # 7. Execute Send Logic (Robust Strategy)
-    logger.info("Tentative: Sending EDITOR_ACTION (Enter)...")
-    keyevent("EDITOR_ACTION")
-    utils.random_sleep(0.5, 1.0)
+    logger.info(f"Will shout-out in {len(groups)} group(s): {groups}")
     
-    # Also click the Send Button as backup
-    utils.safe_click(config.CHAT_SEND_X, config.CHAT_SEND_Y, "Send Button")
-    utils.random_sleep(2.0, 3.0)
-    
-    # 8. Return to Planet (Exit Chat)
-    logger.info("Exiting chat...")
-    utils.press_back()  # Hide Keyboard
-    utils.press_back()  # Exit Chat
+    # 2. Loop through each group
+    for i, group_name in enumerate(groups):
+        logger.info(f"[{i+1}/{len(groups)}] Processing group: '{group_name}'")
+        
+        # Navigate to Planet first
+        utils.navigate_to_planet()
+        
+        # Shout-out in this group
+        _shoutout_to_single_group(group_name)
+        
+        # Brief pause between groups
+        if i < len(groups) - 1:
+            logger.info("Waiting before next group...")
+            utils.random_sleep(3.0, 5.0)
     
     logger.info("--- Task A Complete ---")
 
