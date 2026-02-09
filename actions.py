@@ -273,6 +273,33 @@ def perform_task_c_follow_back():
     else:
         logger.info(f"Template file found: {IMAGE_PATH}")
     
+    # Debug: Test screenshot capability
+    logger.info("Testing screenshot capability...")
+    try:
+        test_screen = G.DEVICE.snapshot()
+        if test_screen is None:
+            logger.error("CRITICAL: snapshot() returned None - screenshot failed!")
+            logger.info("--- Task C Aborted (Screenshot Failed) ---")
+            return
+        else:
+            logger.info(f"Screenshot successful: type={type(test_screen)}")
+    except Exception as e:
+        logger.error(f"CRITICAL: Screenshot test failed with exception: {e}")
+        import traceback
+        traceback.print_exc()
+        return
+    
+    # Debug: Test Template creation
+    logger.info("Testing Template object creation...")
+    try:
+        test_template = Template(IMAGE_PATH, threshold=MATCH_THRESHOLD)
+        logger.info(f"Template created successfully: {test_template}")
+    except Exception as e:
+        logger.error(f"CRITICAL: Template creation failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return
+    
     # 3. Detection and Action Loop (Batch Processing)
     for page in range(MAX_SWIPES):
         logger.info(f"Scanning Page {page + 1}/{MAX_SWIPES}...")
@@ -280,8 +307,23 @@ def perform_task_c_follow_back():
         try:
             # Step 1: Scan ONCE (find_all returns list of dicts)
             logger.info(f"Attempting find_all with threshold={MATCH_THRESHOLD}")
-            matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
-            logger.info(f"find_all returned: {type(matches)}, length: {len(matches) if matches else 0}")
+            
+            try:
+                matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
+                logger.info(f"find_all returned: type={type(matches)}, value={matches}")
+                
+                # Additional check
+                if matches is None:
+                    logger.warning("find_all returned None - this is abnormal!")
+                    logger.warning("Attempting alternative: exists() check...")
+                    exists_result = exists(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
+                    logger.info(f"exists() returned: {exists_result}")
+                    
+            except Exception as inner_e:
+                logger.error(f"Exception during find_all: {inner_e}")
+                import traceback
+                traceback.print_exc()
+                matches = None
             
             if not matches:
                 logger.info("No 'Follow' buttons found on this page.")
