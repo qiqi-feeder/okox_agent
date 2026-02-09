@@ -4,7 +4,7 @@ import random
 import logging
 from airtest.core.api import *
 import config
-import utils
+import utils 
 
 logger = logging.getLogger("OKXBot")
 
@@ -263,13 +263,25 @@ def perform_task_c_follow_back():
     IMAGE_PATH = r"assets/btn_follow.png"
     MATCH_THRESHOLD = 0.9 
     
+    # Debug: Check if template file exists
+    import os
+    if not os.path.exists(IMAGE_PATH):
+        logger.error(f"Template file NOT FOUND: {IMAGE_PATH}")
+        logger.error(f"Current working directory: {os.getcwd()}")
+        logger.info("--- Task C Aborted (Template Missing) ---")
+        return
+    else:
+        logger.info(f"Template file found: {IMAGE_PATH}")
+    
     # 3. Detection and Action Loop (Batch Processing)
     for page in range(MAX_SWIPES):
         logger.info(f"Scanning Page {page + 1}/{MAX_SWIPES}...")
         
         try:
             # Step 1: Scan ONCE (find_all returns list of dicts)
+            logger.debug(f"Attempting find_all with threshold={MATCH_THRESHOLD}")
             matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
+            logger.debug(f"find_all returned: {type(matches)}, length: {len(matches) if matches else 0}")
             
             if not matches:
                 logger.info("No 'Follow' buttons found on this page.")
@@ -300,10 +312,12 @@ def perform_task_c_follow_back():
                     except Exception as e:
                         logger.error(f"Failed to click match: {e}")
                         
-        except TargetNotFoundError:
-             logger.info("No targets found (TargetNotFoundError).")
+        except TargetNotFoundError as e:
+             logger.info(f"No targets found (TargetNotFoundError): {e}")
         except Exception as e:
             logger.error(f"Error during detection loop: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Step 5: Scroll for next page
         logger.info("Scrolling down...")
