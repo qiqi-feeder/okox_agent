@@ -99,4 +99,4 @@ OCR_MAX_SCROLL = 5
 # ==============================================================================
 # 关注按钮图像识别阈值 (0.0-1.0)，越低越宽松
 # Follow button image recognition threshold
-FOLLOW_BTN_THRESHOLD = 0.75  # 降低到 0.75 以提高识别率
+FOLLOW_BTN_THRESHOLD = 0.9

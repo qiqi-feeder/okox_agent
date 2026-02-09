@@ -15,10 +15,9 @@ logger = logging.getLogger("OKXBot")
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 # Optimize Logging: Suppress Airtest noise
-# TEMPORARILY DISABLED FOR DEBUGGING
-# logging.getLogger("airtest").setLevel(logging.WARNING)
-# logging.getLogger("airtest.core.api").setLevel(logging.WARNING)
-# logging.getLogger("airtest.core.android.adb").setLevel(logging.WARNING)
+logging.getLogger("airtest").setLevel(logging.WARNING)
+logging.getLogger("airtest.core.api").setLevel(logging.WARNING)
+logging.getLogger("airtest.core.android.adb").setLevel(logging.WARNING)
 
 def init_device_connection():
     """Initializes the ADB connection to the Android device with Optimization settings."""

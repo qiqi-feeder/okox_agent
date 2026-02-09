@@ -261,47 +261,7 @@ def perform_task_c_follow_back():
     # Settings
     MAX_SWIPES = 5
     IMAGE_PATH = r"assets/btn_follow.png"
-    # Lower threshold from 0.9 to 0.75 for better matching
-    MATCH_THRESHOLD = getattr(config, 'FOLLOW_BTN_THRESHOLD', 0.75)
-    
-    logger.info(f"Image recognition settings: threshold={MATCH_THRESHOLD}") 
-    
-    # Debug: Check if template file exists
-    import os
-    if not os.path.exists(IMAGE_PATH):
-        logger.error(f"Template file NOT FOUND: {IMAGE_PATH}")
-        logger.error(f"Current working directory: {os.getcwd()}")
-        logger.info("--- Task C Aborted (Template Missing) ---")
-        return
-    else:
-        logger.info(f"Template file found: {IMAGE_PATH}")
-    
-    # Debug: Test screenshot capability
-    logger.info("Testing screenshot capability...")
-    try:
-        test_screen = G.DEVICE.snapshot()
-        if test_screen is None:
-            logger.error("CRITICAL: snapshot() returned None - screenshot failed!")
-            logger.info("--- Task C Aborted (Screenshot Failed) ---")
-            return
-        else:
-            logger.info(f"Screenshot successful: type={type(test_screen)}")
-    except Exception as e:
-        logger.error(f"CRITICAL: Screenshot test failed with exception: {e}")
-        import traceback
-        traceback.print_exc()
-        return
-    
-    # Debug: Test Template creation
-    logger.info("Testing Template object creation...")
-    try:
-        test_template = Template(IMAGE_PATH, threshold=MATCH_THRESHOLD)
-        logger.info(f"Template created successfully: {test_template}")
-    except Exception as e:
-        logger.error(f"CRITICAL: Template creation failed: {e}")
-        import traceback
-        traceback.print_exc()
-        return
+    MATCH_THRESHOLD = getattr(config, 'FOLLOW_BTN_THRESHOLD', 0.9)
     
     # 3. Detection and Action Loop (Batch Processing)
     for page in range(MAX_SWIPES):
@@ -309,24 +269,7 @@ def perform_task_c_follow_back():
         
         try:
             # Step 1: Scan ONCE (find_all returns list of dicts)
-            logger.info(f"Attempting find_all with threshold={MATCH_THRESHOLD}")
-            
-            try:
-                matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
-                logger.info(f"find_all returned: type={type(matches)}, value={matches}")
-                
-                # Additional check
-                if matches is None:
-                    logger.warning("find_all returned None - this is abnormal!")
-                    logger.warning("Attempting alternative: exists() check...")
-                    exists_result = exists(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
-                    logger.info(f"exists() returned: {exists_result}")
-                    
-            except Exception as inner_e:
-                logger.error(f"Exception during find_all: {inner_e}")
-                import traceback
-                traceback.print_exc()
-                matches = None
+            matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
             
             if not matches:
                 logger.info("No 'Follow' buttons found on this page.")
@@ -357,12 +300,10 @@ def perform_task_c_follow_back():
                     except Exception as e:
                         logger.error(f"Failed to click match: {e}")
                         
-        except TargetNotFoundError as e:
-             logger.info(f"No targets found (TargetNotFoundError): {e}")
+        except TargetNotFoundError:
+             logger.info("No targets found (TargetNotFoundError).")
         except Exception as e:
             logger.error(f"Error during detection loop: {e}")
-            import traceback
-            traceback.print_exc()
         
         # Step 5: Scroll for next page
         logger.info("Scrolling down...")
