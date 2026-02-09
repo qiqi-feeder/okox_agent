@@ -93,3 +93,10 @@ LOOP_WAIT_MAX = 900
 # 最大滑动次数（在消息列表中查找群组时）
 # Maximum scroll attempts when searching for group in message list
 OCR_MAX_SCROLL = 5
+
+# ==============================================================================
+# 6. TASK C SETTINGS (任务 C 设置 - 粉丝回关)
+# ==============================================================================
+# 关注按钮图像识别阈值 (0.0-1.0)，越低越宽松
+# Follow button image recognition threshold
+FOLLOW_BTN_THRESHOLD = 0.75  # 降低到 0.75 以提高识别率

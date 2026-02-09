@@ -261,7 +261,10 @@ def perform_task_c_follow_back():
     # Settings
     MAX_SWIPES = 5
     IMAGE_PATH = r"assets/btn_follow.png"
-    MATCH_THRESHOLD = 0.9 
+    # Lower threshold from 0.9 to 0.75 for better matching
+    MATCH_THRESHOLD = getattr(config, 'FOLLOW_BTN_THRESHOLD', 0.75)
+    
+    logger.info(f"Image recognition settings: threshold={MATCH_THRESHOLD}") 
     
     # Debug: Check if template file exists
     import os
