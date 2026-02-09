@@ -171,7 +171,9 @@ def get_all_groups_from_file(file_path="groups.txt"):
             logger.warning(f"Group file is empty: {file_path}")
             return []
             
-        logger.info(f"Loaded {len(lines)} groups from file")
+        logger.info(f"Loaded {len(lines)} group(s) from file:")
+        for i, group in enumerate(lines, 1):
+            logger.info(f"  [{i}] {group}")
         return lines
     except Exception as e:
         logger.error(f"Failed to read group file: {e}")

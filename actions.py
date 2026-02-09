@@ -199,12 +199,12 @@ def perform_task_b_share_profile():
     
     New Flow:
     1. Read all groups from 'groups.txt'
-    2. For each group:
-       a. Go to Profile Page
-       b. Open Share menu -> Select Chat
-       c. Search for group name -> Select -> Send
-       d. Return to Profile
-    3. Finally return to Planet
+    2. Navigate to Profile Page once
+    3. For each group:
+       a. Open Share menu -> Select Chat
+       b. Search for group name -> Select -> Send
+       c. (Stays on Profile page after share)
+    4. Finally return to Planet
     """
     logger.info("--- Starting Task B: Share Profile (Multi-Group Mode) ---")
     
@@ -218,17 +218,17 @@ def perform_task_b_share_profile():
     
     logger.info(f"Will share to {len(groups)} group(s): {groups}")
     
-    # 2. Loop through each group
+    # 2. Navigate to Profile Page (ONCE at the beginning)
+    utils.navigate_to_planet()
+    logger.info("Navigating to Profile...")
+    utils.safe_click(config.NAV_PROFILE_ICON_X, config.NAV_PROFILE_ICON_Y, "Profile Icon")
+    utils.random_sleep(2.0, 3.0)
+    
+    # 3. Loop through each group (already on Profile page)
     for i, group_name in enumerate(groups):
         logger.info(f"[{i+1}/{len(groups)}] Processing group: '{group_name}'")
         
-        # Navigate to Profile first
-        utils.navigate_to_planet()
-        logger.info("Navigating to Profile...")
-        utils.safe_click(config.NAV_PROFILE_ICON_X, config.NAV_PROFILE_ICON_Y, "Profile Icon")
-        utils.random_sleep(2.0, 3.0)
-        
-        # Share to this group
+        # Share to this group (no need to navigate, already on Profile)
         _share_to_single_group(group_name)
         
         # Brief pause between shares
@@ -236,7 +236,7 @@ def perform_task_b_share_profile():
             logger.info("Waiting before next share...")
             utils.random_sleep(2.0, 4.0)
     
-    # 3. Return to Planet
+    # 4. Return to Planet
     logger.info("Returning to Planet (System Back)...")
     utils.press_back()
     logger.info("--- Task B Complete ---")
