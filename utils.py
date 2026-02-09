@@ -3,7 +3,6 @@ import time
 import random
 import logging
 import os
-import numpy as np
 from airtest.core.api import *
 from airtest.core.error import *
 import config
@@ -217,6 +216,9 @@ def ocr_screen_text():
         init_ocr()
     
     try:
+        # Lazy import numpy to avoid conflicts with Airtest
+        import numpy as np
+        
         # Capture screen using Airtest
         screen = G.DEVICE.snapshot()
         if screen is None:
