@@ -48,6 +48,11 @@ def main():
     try:
         utils.init_device_connection()
         utils.ensure_app_active()
+        
+        # 2. Initialize OCR (preload model for faster first use)
+        logger.info("Initializing OCR engine...")
+        utils.init_ocr()
+        
     except Exception as e:
         logger.critical(f"Initialization Failed: {e}")
         return

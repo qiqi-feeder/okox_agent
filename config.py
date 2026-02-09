@@ -113,3 +113,10 @@ TYPING_DELAY_MAX = 2.0
 # 主循环等待时间 (15 到 30 分钟) (Main Loop Wait Time) - Updated as per user request
 LOOP_WAIT_MIN = 900  # 15 mins
 LOOP_WAIT_MAX = 1800 # 30 mins
+
+# ==============================================================================
+# 5. OCR SETTINGS (OCR 设置 - PaddleOCR)
+# ==============================================================================
+# 最大滑动次数（在消息列表中查找群组时）
+# Maximum scroll attempts when searching for group in message list
+OCR_MAX_SCROLL = 5
