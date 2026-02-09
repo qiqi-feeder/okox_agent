@@ -98,3 +98,10 @@ MY_AVATAR_FILE = "assets/my_avatar.png"
 # 检测区域阈值 (0.0 - 1.0)
 # 只有当你的头像出现在屏幕下方 (例如 > 50% 高度) 时才判定为最新消息。
 LAST_MSG_CHECK_HEIGHT = 0.5
+
+# ==============================================================================
+# 6. OCR SETTINGS (OCR 设置 - PaddleOCR)
+# ==============================================================================
+# 最大滑动次数（在消息列表中查找群组时）
+# Maximum scroll attempts when searching for group in message list
+OCR_MAX_SCROLL = 5

@@ -10,16 +10,17 @@ logger = logging.getLogger("OKXBot")
 
 def perform_task_a_shoutout():
     """
-    Task A: Group Chat Shout-out (Dynamic Group Support)
+    Task A: Group Chat Shout-out (OCR-Based Group Detection)
+    
+    New Flow:
     1. Go to Planet Tab
-    2. Read 'groups.txt' to get a target group
-    3. If group found: Search -> Enter
-       If no group/file: Click Top 1 (Fallback)
-    4. Anti-Spam Check
-    5. Type & Send
+    2. Read 'groups.txt' to get a random target group
+    3. Use OCR to find the group name in the message list and click it
+    4. Anti-Spam Check (if enabled)
+    5. Type & Send message
     6. Return to Planet
     """
-    logger.info("--- Starting Task A: Shout-out ---")
+    logger.info("--- Starting Task A: Shout-out (OCR Mode) ---")
     
     # 1. Go to Planet Tab
     utils.navigate_to_planet()
@@ -27,127 +28,159 @@ def perform_task_a_shoutout():
     # 2. Determine Target Group
     target_group = utils.get_random_group_from_file("groups.txt")
     
-    entered_via_search = False
-    
-    if target_group:
-        logger.info(f"Mode: Multi-Group Search | Target: {target_group}")
-        # Search Flow
-        # Click Search Icon
-        utils.safe_click(config.PLANET_SEARCH_ICON_X, config.PLANET_SEARCH_ICON_Y, "Planet Search Icon")
-        utils.random_sleep(1.0, 2.0)
-        
-        # Click Input (if needed) and Type
-        utils.safe_click(config.PLANET_SEARCH_INPUT_X, config.PLANET_SEARCH_INPUT_Y, "Search Input")
-        utils.enter_text_safe(target_group)
-        utils.random_sleep(2.0, 3.0)
-        
-        # Click Result
-        utils.safe_click(config.PLANET_SEARCH_RESULT_X, config.PLANET_SEARCH_RESULT_Y, "Search Result")
-        utils.random_sleep(2.0, 4.0) # Wait for chat to load
-        entered_via_search = True
-        
-    else:
-        logger.info("Mode: Single Fixed Group (Top 1)")
+    if not target_group:
+        logger.warning("No target group found in groups.txt. Using fallback (Top 1).")
         # Fallback: Click Top 1 Group (Pinned)
         utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
         utils.random_sleep(2.0, 4.0)
+    else:
+        # 3. Use OCR to find and click the group
+        logger.info(f"Mode: OCR Detection | Target: '{target_group}'")
+        
+        # Try to find and click the group using OCR
+        max_scroll = getattr(config, 'OCR_MAX_SCROLL', 3)
+        found = utils.ocr_click_text(target_group, max_scroll=max_scroll, scroll_direction="down")
+        
+        if not found:
+            logger.warning(f"OCR could not find group '{target_group}'. Using fallback (Top 1).")
+            # Reset to top and click first group
+            utils.navigate_to_planet()
+            utils.safe_click(config.GROUP_TOP1_X, config.GROUP_TOP1_Y, "Top 1 Group")
+            utils.random_sleep(2.0, 4.0)
+        else:
+            # Wait for chat to load
+            utils.random_sleep(2.0, 4.0)
     
-    # [NEW] Anti-Spam Check
-    # Checks if the last message is sent by me. If so, skips sending.
+    # 4. Anti-Spam Check
     if getattr(config, 'ENABLE_ANTI_SPAM', False):
         logger.info("Performing Anti-Spam Check...")
         if utils.check_last_message_is_mine(config.MY_AVATAR_FILE, getattr(config, 'LAST_MSG_CHECK_HEIGHT', 0.5)):
             logger.info(">>> SKIP: Last message is mine. Returning to Planet. <<<")
-            utils.press_back() # Exit Chat
-            if entered_via_search:
-                utils.press_back() # Exit Search Page to Planet
+            utils.press_back()  # Exit Chat
             return
     
-    # 3. Click Input Box
+    # 5. Click Input Box
     utils.safe_click(config.CHAT_INPUT_X, config.CHAT_INPUT_Y, "Chat Input Box")
     utils.random_sleep(1.0, 2.0)
     
-    # 4. Type Message
+    # 6. Type Message
     msg = random.choice(config.MSG_POOL)
     utils.enter_text_safe(msg)
     
-    # 5. Execute Send Logic (Robust Strategy)
-    # Attempt 1: Send 'Enter'/'Action' event via ADB
+    # 7. Execute Send Logic (Robust Strategy)
     logger.info("Tentative: Sending EDITOR_ACTION (Enter)...")
     keyevent("EDITOR_ACTION")
     utils.random_sleep(0.5, 1.0)
     
-    # Attempt 2: Click the Send Button Coordinate
+    # Also click the Send Button as backup
     utils.safe_click(config.CHAT_SEND_X, config.CHAT_SEND_Y, "Send Button")
     utils.random_sleep(2.0, 3.0)
     
-    # 6. Return to Planet (Exit Chat Logic)
-    # User Request: Back twice (1st: Hide Input, 2nd: Exit Chat)
+    # 8. Return to Planet (Exit Chat)
     logger.info("Exiting chat...")
-    utils.press_back() # 1. Hide Keyboard
-    utils.press_back() # 2. Exit Chat
-    
-    if entered_via_search:
-         # If we entered via search, we are now back at the Search Results page
-         # Need one more back to return to Planet Tab
-         logger.info("Exiting Search Page...")
-         utils.press_back() 
+    utils.press_back()  # Hide Keyboard
+    utils.press_back()  # Exit Chat
     
     logger.info("--- Task A Complete ---")
 
+def _share_to_single_group(group_name):
+    """
+    Helper function: Share profile to a single group.
+    Assumes we are already on the Profile page.
+    
+    Args:
+        group_name: Name of the group to share to
+        
+    Returns:
+        True if share was successful, False otherwise
+    """
+    logger.info(f"Sharing profile to group: '{group_name}'")
+    
+    try:
+        # 1. Open Menu and Share
+        logger.info("Opening More Menu...")
+        utils.safe_click(config.PROFILE_MORE_X, config.PROFILE_MORE_Y, "More (...) Icon")
+        utils.random_sleep(1.0, 2.0)
+        
+        logger.info("Clicking Share Profile...")
+        utils.safe_click(config.PROFILE_MENU_SHARE_X, config.PROFILE_MENU_SHARE_Y, "Share Profile Option")
+        utils.random_sleep(2.0, 3.0)
+        
+        logger.info("Selecting 'Chat' channel...")
+        utils.safe_click(config.SHARE_TO_CHAT_X, config.SHARE_TO_CHAT_Y, "Share to Chat Icon")
+        utils.random_sleep(2.0, 4.0)
+        
+        # 2. Search for Target Group
+        logger.info(f"Searching for group: '{group_name}'")
+        utils.safe_click(config.SHARE_SEARCH_X, config.SHARE_SEARCH_Y, "Search Input Box")
+        utils.random_sleep(1.0, 1.5)
+        
+        # Input Name
+        utils.enter_text_safe(group_name)
+        utils.random_sleep(2.0, 3.0)
+        
+        # Click First Result
+        logger.info("Selecting first search result...")
+        utils.safe_click(config.SHARE_RESULT_1_X, config.SHARE_RESULT_1_Y, "First Search Result")
+        utils.random_sleep(1.5, 2.5)
+        
+        # 3. Click Final Share/Send Button
+        logger.info("Clicking Final Share Button...")
+        utils.safe_click(config.SHARE_BOTTOM_BTN_X, config.SHARE_BOTTOM_BTN_Y, "Bottom Share Button")
+        utils.random_sleep(3.0, 5.0)
+        
+        logger.info(f"Successfully shared to '{group_name}'")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Failed to share to '{group_name}': {e}")
+        return False
+
+
 def perform_task_b_share_profile():
     """
-    Task B: Share Profile Card (Refined Search Flow)
-    1. Go to Planet Tab -> Profile
-    2. Click More (...) -> Share Profile -> Chat
-    3. Click Search -> Input Group Name -> Click Result
-    4. Click Share/Send Button
-    5. Return to Planet
+    Task B: Share Profile Card (Multi-Group Support)
+    
+    New Flow:
+    1. Read all groups from 'groups.txt'
+    2. For each group:
+       a. Go to Profile Page
+       b. Open Share menu -> Select Chat
+       c. Search for group name -> Select -> Send
+       d. Return to Profile
+    3. Finally return to Planet
     """
-    logger.info("--- Starting Task B: Share Profile (Search Flow) ---")
+    logger.info("--- Starting Task B: Share Profile (Multi-Group Mode) ---")
     
-    # 1. Go to Profile Page (via Planet Tab)
-    utils.navigate_to_planet() 
-    logger.info("Navigating to Profile...")
-    utils.safe_click(config.NAV_PROFILE_ICON_X, config.NAV_PROFILE_ICON_Y, "Profile Icon")
-    utils.random_sleep(2.0, 3.0)
+    # 1. Get all groups from file
+    groups = utils.get_all_groups_from_file("groups.txt")
     
-    # 2. Open Menu and Share
-    logger.info("Opening More Menu...")
-    utils.safe_click(config.PROFILE_MORE_X, config.PROFILE_MORE_Y, "More (...) Icon")
-    utils.random_sleep(1.0, 2.0)
+    if not groups:
+        # Fallback to single group from config
+        logger.warning("No groups in groups.txt. Using config.TARGET_GROUP_NAME as fallback.")
+        groups = [config.TARGET_GROUP_NAME]
     
-    logger.info("Clicking Share Profile...")
-    utils.safe_click(config.PROFILE_MENU_SHARE_X, config.PROFILE_MENU_SHARE_Y, "Share Profile Option")
-    utils.random_sleep(2.0, 3.0)
+    logger.info(f"Will share to {len(groups)} group(s): {groups}")
     
-    logger.info("Selecting 'Chat' channel...")
-    utils.safe_click(config.SHARE_TO_CHAT_X, config.SHARE_TO_CHAT_Y, "Share to Chat Icon")
-    utils.random_sleep(2.0, 4.0)
+    # 2. Loop through each group
+    for i, group_name in enumerate(groups):
+        logger.info(f"[{i+1}/{len(groups)}] Processing group: '{group_name}'")
+        
+        # Navigate to Profile first
+        utils.navigate_to_planet()
+        logger.info("Navigating to Profile...")
+        utils.safe_click(config.NAV_PROFILE_ICON_X, config.NAV_PROFILE_ICON_Y, "Profile Icon")
+        utils.random_sleep(2.0, 3.0)
+        
+        # Share to this group
+        _share_to_single_group(group_name)
+        
+        # Brief pause between shares
+        if i < len(groups) - 1:
+            logger.info("Waiting before next share...")
+            utils.random_sleep(2.0, 4.0)
     
-    # 3. Search for Target Group
-    logger.info(f"Searching for group: {config.TARGET_GROUP_NAME}")
-    # Click Search Box
-    utils.safe_click(config.SHARE_SEARCH_X, config.SHARE_SEARCH_Y, "Search Input Box")
-    utils.random_sleep(1.0, 1.5)
-    
-    # Input Name
-    utils.enter_text_safe(config.TARGET_GROUP_NAME)
-    # Give search results time to load
-    utils.random_sleep(2.0, 3.0)
-    
-    # Click First Result
-    logger.info("Selecting first search result...")
-    utils.safe_click(config.SHARE_RESULT_1_X, config.SHARE_RESULT_1_Y, "First Search Result")
-    utils.random_sleep(1.5, 2.5)
-    
-    # 4. Click Final Share/Send Button
-    logger.info("Clicking Final Share Button...")
-    utils.safe_click(config.SHARE_BOTTOM_BTN_X, config.SHARE_BOTTOM_BTN_Y, "Bottom Share Button")
-    utils.random_sleep(3.0, 5.0)
-    
-    # 5. Return to Planet
-    # User feedback: No "Planet" button on Profile page. Use System Back.
+    # 3. Return to Planet
     logger.info("Returning to Planet (System Back)...")
     utils.press_back()
     logger.info("--- Task B Complete ---")

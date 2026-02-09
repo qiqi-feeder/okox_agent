@@ -83,5 +83,13 @@ CLICK_DELAY_MIN = 0.8
 CLICK_DELAY_MAX = 1.5
 TYPING_DELAY_MIN = 1.0
 TYPING_DELAY_MAX = 2.0
+# 保留本地的等待时间配置
 LOOP_WAIT_MIN = 600
 LOOP_WAIT_MAX = 900
+
+# ==============================================================================
+# 5. OCR SETTINGS (OCR 设置 - PaddleOCR)
+# ==============================================================================
+# 最大滑动次数（在消息列表中查找群组时）
+# Maximum scroll attempts when searching for group in message list
+OCR_MAX_SCROLL = 5
