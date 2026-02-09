@@ -279,9 +279,9 @@ def perform_task_c_follow_back():
         
         try:
             # Step 1: Scan ONCE (find_all returns list of dicts)
-            logger.debug(f"Attempting find_all with threshold={MATCH_THRESHOLD}")
+            logger.info(f"Attempting find_all with threshold={MATCH_THRESHOLD}")
             matches = find_all(Template(IMAGE_PATH, threshold=MATCH_THRESHOLD))
-            logger.debug(f"find_all returned: {type(matches)}, length: {len(matches) if matches else 0}")
+            logger.info(f"find_all returned: {type(matches)}, length: {len(matches) if matches else 0}")
             
             if not matches:
                 logger.info("No 'Follow' buttons found on this page.")
